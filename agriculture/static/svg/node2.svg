@@ -1,0 +1,29 @@
+<?xml version="1.0" standalone="no"?>
+
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" 
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink"
+             xmlns:a3="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+             a3:scriptImplementation="Adobe" width="80" height="80">
+        <script type="text/ecmascript" a3:scriptImplementation="Adobe">
+		<![CDATA[
+		function HiddenElements(evt)
+		{
+
+			var imageTarget = evt.target;
+			var theFill = imageTarget.getAttribute("fill");
+			if (theFill == 'green')
+			  imageTarget.setAttribute("fill", "red");
+			if (theFill == 'red')
+			  imageTarget.setAttribute("fill", "black");
+
+		}
+		]]>
+	    </script>
+        <circle cx="21" cy="21" r="20" fill="black" stroke="white" stroke-width="1" onclick= "HiddenElements(evt)"/>
+
+        </svg>
+

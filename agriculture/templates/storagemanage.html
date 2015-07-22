@@ -1,0 +1,678 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="zh">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>作物生长数据采集系统平台</title>
+<!-- Favicons -->
+<link rel="shortcut icon" type="image/png" HREF="../static/img/favicons/favicon.gif"/>
+<link rel="icon" type="image/png" HREF="../static/img/favicons/favicon.gif"/>
+<link rel="apple-touch-icon" HREF="../static/img/favicons/styler-icon.png" />
+<link href="../static/css/main.css" rel="stylesheet" type="text/css" />
+<link href="../static/css/storage.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="../static/js/jquery-2.1.1.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(document.getElementsByClassName('plus')).hide();
+        $(document.getElementsByClassName('minus')).hide();
+    })
+</script>
+
+</head>
+<body>
+<div id="NewTopPanel">
+  <img src="../static/images/logo.gif" title="Trial Services" alt="Trial Services" width="230" height="80" border="0" />
+  <br>
+  <h1 style="color:black; text-align:center;">作物生长数据采集系统平台</h1>
+  <br>
+  <br>
+  <p id="logout">
+        欢迎您，<span>{{ logeduser }}</span> &nbsp; &nbsp;
+        <a href="/logout/" style="text-decoration:none; color:#000000">退出</a>
+  <hr>
+</div>
+<!-- Container -->
+<div id="container">
+	<div class="shell">
+		<!-- Main -->
+		<div id="main">
+			<div class="cl">&nbsp;</div>
+
+			<!-- Content -->
+			<div id="content">
+				<!-- Box -->
+				<div class="box">
+					<!-- Box Head -->
+					<div class="box-head">
+						<h2 class="left">库房概览</h2>
+						<div class="right">
+							<label>搜索库房</label>
+							<input type="text" class="field small-field" />
+							<input type="submit" class="button" value="搜索" />
+						</div>
+					</div>
+					<!-- End Box Head -->
+					<!-- Table -->
+					<div class="table" id="OddTable">
+						<table id="StoreTable" width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tr>
+								<th ></th>
+								<th style="width: 20%">库房</th>
+								<th style="width: 35%">传感器个数</th>
+								<th style="width: 25%"width="110" class="ac">删除</th>
+                                <th style="width: 19%">编辑</th>
+							</tr>
+                            {% for storage in list %}
+                                 <tr>
+                                    <td><input type="checkbox" class="checkbox" /></td>
+                                    <td ><h3><a class="station" href="#" onclick="ShowStore(this.innerHTML)">{{storage.index}}号库房</a></h3></td>
+                                    <td ><a class="text_box" onclick="ShowData(this)" style="cursor: pointer;">{% comment %}{{ storage.num_air |add:storage.num_soilt | add:storage.num_soilm | add:storage.num_sunlight | add:storage.num_coz}}{% endcomment %}<img src="../static/img/bullet_arrow_down.png"></a></td>
+                                    <td ><a href="#" class="ico del" onclick="del(this)">删除库房</a></td>
+                                    <td ><a href="#" class="ico edit" onclick="ShowDetails($(this).parent().parent().find('.station')[0].innerHTML)">编辑库房</a></td>
+                                </tr>
+                                <tr style="display: none"><td></td><td></td><td>空气温湿度：{{ storage.num_air }}个<br/>土壤温度：{{ storage.num_soilt }}个<br/>土壤湿度：{{ storage.num_soilm }}个<br/>光照：{{ storage.num_sunlight }}个<br/>二氧化碳：{{ storage.num_coz }}个</td></tr>
+                            {% endfor %}
+                            <tr id="AddOne">
+                                <td></td>
+                                <td><a class="ico add" style="cursor: pointer" onclick="AddLine()">&nbsp增加库房</a></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+						</table>
+					</div>
+					<!-- Table -->
+
+                    <div id="NewStore" align="center" style="display: none">
+                        <table border="1" width="47%" height="250" style="border-width: 0px">
+                            <!-- MSTableType="layout" -->
+                            <tr>
+                                <td style="border-style: none; border-width: medium">　
+                                    <form class="contact_form" action="#" method="post" name="contact_form">
+                                        {% csrf_token %}
+                                        <ul>
+                                            <li>
+                                                 <h2>新的库房</h2>
+                                                 <span class="required_notification">* 表示必填项</span>
+                                            </li>
+                                            <li>
+                                                <label>库房编号:</label>
+                                                <input id="index" name="index" type="text"  placeholder="仅由数字组成" onblur="Validate()" onfocus="$('#StoreHint').hide()"/>
+                                                <span id="StoreHint" class="form_hint" style="display: none">该库房已存在，请重新输入！</span>
+                                            </li>
+                                            <li>
+                                                <label>空气温湿度传感器:</label>
+                                                <input id="num_air" name="num_air[]" type="text" placeholder="编号" style="width: 40px;margin-right: 10px" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide();"/>
+                                                <span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span>
+
+                                                <select id="Addr_air" name="Addr_air[]" style="width: 90px;height: 30px;margin-right: 10px">
+                                                    <option>左上</option>
+                                                    <option>左中</option>
+                                                    <option>左下</option>
+                                                    <option>中上</option>
+                                                    <option>中间</option>
+                                                    <option>中下</option>
+                                                    <option>右上</option>
+                                                    <option>右中</option>
+                                                    <option>右下</option>
+                                                </select>
+                                                <button type="button" style="margin-left: 13px" onclick="AddSame(this)" disabled="disabled"><img src="../static/img/gif-0888.gif" />Add</button>
+                                                <br/>
+
+
+                                            </li>
+                                            <li>
+                                                <label>土壤温度传感器:</label>
+                                                <input id="num_soilt" name="num_soilt[]" type="text" placeholder="编号" style="width: 40px;margin-right: 10px" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide()"/>
+                                                <span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span>
+                                                <select name="Addr_soilt[]" style="width: 90px;height: 30px;margin-right: 10px">
+                                                    <option>左上</option>
+                                                    <option>左中</option>
+                                                    <option>左下</option>
+                                                    <option>中上</option>
+                                                    <option>中间</option>
+                                                    <option>中下</option>
+                                                    <option>右上</option>
+                                                    <option>右中</option>
+                                                    <option>右下</option>
+                                                </select>
+                                                <button type="button" style="margin-left: 13px" onclick="AddSame(this)" disabled="disabled"><img src="../static/img/gif-0888.gif" />Add</button>
+                                                <br/>
+                                            </li>
+                                            <li>
+                                                <label>土壤湿度传感器:</label>
+                                                <input id="num_soilm" name="num_soilm[]" type="text" placeholder="编号" style="width: 40px;margin-right: 10px" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide()"/>
+                                                <span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span>
+                                                <select name="Addr_soilm[]" style="width: 90px;height: 30px;margin-right: 10px">
+                                                    <option>左上</option>
+                                                    <option>左中</option>
+                                                    <option>左下</option>
+                                                    <option>中上</option>
+                                                    <option>中间</option>
+                                                    <option>中下</option>
+                                                    <option>右上</option>
+                                                    <option>右中</option>
+                                                    <option>右下</option>
+                                                </select>
+                                                <button type="button" style="margin-left: 13px" onclick="AddSame(this)" disabled="disabled"><img src="../static/img/gif-0888.gif" />Add</button>
+                                                <br/>
+                                            </li>
+                                            <li>
+                                                <label>光照度传感器:</label>
+                                                <input id="num_light" name="num_light[]" type="text" placeholder="编号" style="width: 40px;margin-right: 10px" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide()"/>
+                                                <span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span>
+                                                <select name="Addr_light[]" style="width: 90px;height: 30px;margin-right: 10px">
+                                                    <option>左上</option>
+                                                    <option>左中</option>
+                                                    <option>左下</option>
+                                                    <option>中上</option>
+                                                    <option>中间</option>
+                                                    <option>中下</option>
+                                                    <option>右上</option>
+                                                    <option>右中</option>
+                                                    <option>右下</option>
+                                                </select>
+                                                <button type="button" style="margin-left: 13px" onclick="AddSame(this)" disabled="disabled"><img src="../static/img/gif-0888.gif" />Add</button>
+                                                <br/>
+                                            </li>
+                                            <li>
+                                                <label>二氧化碳传感器:</label>
+                                                <input id="num_coz" name="num_coz[]" type="text" placeholder="编号" style="width: 40px;margin-right: 10px" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide()"/>
+                                                <span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span>
+                                                <select name="Addr_coz[]" style="width: 90px;height: 30px;margin-right: 10px">
+                                                    <option>左上</option>
+                                                    <option>左中</option>
+                                                    <option>左下</option>
+                                                    <option>中上</option>
+                                                    <option>中间</option>
+                                                    <option>中下</option>
+                                                    <option>右上</option>
+                                                    <option>右中</option>
+                                                    <option>右下</option>
+                                                </select>
+                                                <button type="button" style="margin-left: 13px" onclick="AddSame(this)" disabled="disabled"><img src="../static/img/gif-0888.gif" />Add</button>
+                                                <br/>
+                                            </li>
+                                            <li>
+                                                <button id="SaveNew" class="submit" type="submit" disabled="disabled">保存</button>
+                                                <button class="submit" type="button" onclick="DoNot()">取消</button>
+                                            </li>
+                                        </ul>
+                                    </form>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+				<!-- End Box -->
+			    </div>
+			<!-- End Content -->
+			    <div class="cl">&nbsp;</div>
+		    </div>
+		<!-- Main -->
+	    </div>
+
+    </div>
+</div>
+<!-- End Container -->
+<div id="ReturnToMain" style="position: fixed;top: 600px;left: 50px">
+    <a style="cursor: pointer" href="../main/{{ logeduser }}"><img src="../static/img/return.jpg"/></a>
+</div>
+<div id="EditStore" align="center" class="table" style="display: none;z-index: 999;position: absolute;">
+    <h2 id="EditNum" style="font-family:Georgia, Times, Times New Roman, serif;margin:0;display: inline;"></h2>
+    <input type="button" value="关闭" onclick="$('#EditStore').css('display','none');" style="margin-left: 300px"/>
+    <table id="ThisStore" width="37%" border="0" cellspacing="0" cellpadding="0">
+        <form action="#" method="post" name="contact_form">
+            {% csrf_token %}
+            <tr>
+                <th ></th>
+                <th style="width: 20%">编号</th>
+                <th style="width: 40%">传感器类型</th>
+                <th style="width: 20%">位置</th>
+                <th style="width: 19%" class="ac">删除</th>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td><a class="ico add" style="cursor: pointer" onclick="AddSensor()">&nbsp增加</a></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </form>
+
+    </table>
+    <button id="DoEdit" class="submit" type="submit" disabled="disabled">保存</button>
+    <button class="submit" type="button" onclick="$('#EditStore').css('display','none')">取消</button>
+</div>
+<div id="ShowStore" align="center" class="table" style="display: none;z-index: 999;position: absolute;">
+    <h2 id="EditNum1" style="font-family:Georgia, Times, Times New Roman, serif;margin:0;display: inline;"></h2>
+    <input type="button" value="关闭" onclick="$('#ShowStore').css('display','none');" style="margin-left: 300px"/>
+    <table id="ThisStore1" width="37%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <th></th>
+            <th style="width: 25%">编号</th>
+            <th style="width: 45%">传感器类型</th>
+            <th style="width: 30%">位置</th>
+        </tr>
+        <tr><td></td><td></td><td></td><td></td></tr>
+    </table>
+</div>
+</body>
+<script type="text/javascript">
+
+function del(e){
+    var name;
+    name=$(e).parent().parent().find('.station')[0].innerHTML;
+    e.setAttribute('href','/delete/'+name+'');
+}
+function Plus(e){
+    e.nextSibling.value++;
+}
+function Minus(e){
+
+    if(e.previousSibling.value>0)
+    {
+        e.previousSibling.value--;
+    }
+
+}
+function ShowNewWindow(){
+    window.open('storagemanage.html','StoreInform','height=200,width=150,left=400,top=200');
+}
+
+function AddLine(){
+    $('#AddOne').hide();
+    $('#NewStore').slideToggle();
+    {% comment %}var distance=$(document).height()-$(window).height();{% endcomment %}
+    {% comment %}$(document).scrollTop(distance);{% endcomment %}
+}
+
+function AddSensor(){
+    var newrow='<tr><td><input type="checkbox" class="checkbox" /></td><td><input class="num" name="" type="text" onchange="CheckEdit(this)" onfocus="$(this.nextElementSibling).hide()" style="width: 50px"/><span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span></td><td><select class="type"><option value="air">空气温湿度</option><option value="soilt">土壤温度</option><option value="soilm">土壤湿度</option><option value="sun">光照</option><option value="coz">二氧化碳</option></select></td><td><select class="Addr" name=""><option>左上</option><option>左中</option><option>左下</option><option>中上</option><option>中间</option><option>中下</option><option>右上</option><option>右中</option><option>右下</option></select></td><td><a href="#" class="ico del" onclick="DelSensor(this)">删除</a></td></tr>';
+    $('#ThisStore tr:last').before(newrow);
+    var rows=document.getElementById('ThisStore').rows.length-3;
+    var obj=document.getElementsByClassName("type");
+    switch (obj[rows].value){
+        case "air":
+            document.getElementsByClassName("num")[rows].name="num_air[]";
+            document.getElementsByClassName("Addr")[rows].name="Addr_air[]";
+            break;
+        case "soilt":
+            document.getElementsByClassName("num")[rows].name="num_soilt[]";
+            document.getElementsByClassName("Addr")[rows].name="Addr_soilt[]";
+            break;
+        case "soilm":
+            document.getElementsByClassName("num")[rows].name="num_soilm[]";
+            document.getElementsByClassName("Addr")[rows].name="Addr_soilm[]";
+            break;
+        case "sun":
+            document.getElementsByClassName("num")[rows].name="num_light[]";
+            document.getElementsByClassName("Addr")[rows].name="Addr_light[]";
+            break;
+        case "coz":
+            document.getElementsByClassName("num")[rows].name="num_coz[]";
+            document.getElementsByClassName("Addr")[rows].name="Addr_coz[]";
+            break;
+    }
+}
+function ShowData(e){
+    var obj=e;
+    $(obj.parentNode.parentNode.nextElementSibling).toggle();
+}
+function DoNot(){
+    $('#NewStore').slideToggle();
+    $('#AddOne').show();
+}
+function AddSame(e){
+    var sensor= $(e).parent().find('label');
+    switch (sensor[0].innerHTML){
+        case "空气温湿度传感器:": var obj='<input name="num_air[]" type="text" placeholder="编号" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide()" style="width: 40px;margin-right: 15px;margin-left: 156px;margin-top: 10px;"><span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span><select name="Addr_air[]" style="width: 90px;height: 30px;margin-right: 10px"><option>左上</option><option>左中</option><option>左下</option><option>中上</option><option>中间</option><option>中下</option><option>右上</option><option>右中</option><option>右下</option></select><br/>';
+            break;
+        case "土壤温度传感器:":var obj='<input name="num_soilt[]" type="text" placeholder="编号" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide()" style="width: 40px;margin-right: 15px;margin-left: 156px;margin-top: 10px;"><span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span><select name="Addr_soilt[]" style="width: 90px;height: 30px;margin-right: 10px"><option>左上</option><option>左中</option><option>左下</option><option>中上</option><option>中间</option><option>中下</option><option>右上</option><option>右中</option><option>右下</option></select><br/>';
+            break;
+        case "土壤湿度传感器:":var obj='<input name="num_soilm[]" type="text" placeholder="编号" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide()" style="width: 40px;margin-right: 15px;margin-left: 156px;margin-top: 10px;"><span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span><select name="Addr_soilm[]" style="width: 90px;height: 30px;margin-right: 10px"><option>左上</option><option>左中</option><option>左下</option><option>中上</option><option>中间</option><option>中下</option><option>右上</option><option>右中</option><option>右下</option></select><br/>';
+            break;
+        case "光照度传感器:":var obj='<input name="num_light[]" type="text" placeholder="编号" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide()" style="width: 40px;margin-right: 15px;margin-left: 156px;margin-top: 10px;"><span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span><select name="Addr_light[]" style="width: 90px;height: 30px;margin-right: 10px"><option>左上</option><option>左中</option><option>左下</option><option>中上</option><option>中间</option><option>中下</option><option>右上</option><option>右中</option><option>右下</option></select><br/>';
+            break;
+        case "二氧化碳传感器:":var obj='<input name="num_coz[]" type="text" placeholder="编号" onchange="Check(this)" onfocus="$(this.nextElementSibling).hide()" style="width: 40px;margin-right: 15px;margin-left: 156px;margin-top: 10px;"><span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span><select name="Addr_coz[]" style="width: 90px;height: 30px;margin-right: 10px"><option>左上</option><option>左中</option><option>左下</option><option>中上</option><option>中间</option><option>中下</option><option>右上</option><option>右中</option><option>右下</option></select><br/>';
+            break;
+    }
+
+    var newbutton=document.createElement('button');
+    newbutton.innerHTML='<img src="../static/img/gif-0888.gif"/>Add';
+    newbutton.style.marginLeft="13px";
+    newbutton.type="button";
+    newbutton.disabled="disabled";
+    $(newbutton).bind('click',function(){
+        AddSame(this);
+    });
+
+    $(e.nextElementSibling).after(obj);
+    $(e.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling).after(newbutton);
+    $(e).hide();
+
+}
+
+function Validate(){
+    var newstore=document.getElementById('index').value+'号库房';
+    var i;
+    var total=document.getElementById('StoreTable').rows.length;
+    var oldstore;
+    var flag=1;
+    var hint=document.getElementById('StoreHint');
+    document.getElementById('SaveNew').setAttribute('disabled','disabled');
+    if(document.getElementById('index').value=='')
+    {
+        flag=0;
+        hint.innerHTML='请输入库房编号';
+        $(hint).toggle();
+    }
+    else{
+        for(i=0;(2*i+1)<(total-2);i++){
+            oldstore=$('#StoreTable')[0].rows[2*i+1].cells[1].children[0].children[0].innerHTML;
+            if(newstore==oldstore)
+            {
+                flag=0;
+                hint.innerHTML='该库房已存在，请重新输入！';
+                $(hint).toggle();
+                document.getElementById('index').value="";
+            }
+        }
+    }
+
+    if(flag==1&&CheckAll()==1){
+        $('#SaveNew').removeAttr('disabled');
+    }
+    return flag;
+}
+
+function Check(e){
+    $(e.nextElementSibling.nextElementSibling.nextElementSibling).attr('disabled','disabled');
+    if(e.value!='')
+    {
+        $(e.nextElementSibling.nextElementSibling.nextElementSibling).removeAttr('disabled');
+        var newindex= e.value;
+        var exsit=[];
+        var i;
+        var exsit_air=document.getElementsByName('num_air[]');
+        var exsit_soilt=document.getElementsByName('num_soilt[]');
+        var exsit_soilm=document.getElementsByName('num_soilm[]');
+        var exsit_light=document.getElementsByName('num_light[]');
+        var exsit_coz=document.getElementsByName('num_coz[]');
+        var Flag=1;
+        for(i=0;i<exsit_air.length;i++){
+            if(exsit_air[i].value!=''&& exsit_air[i]!=e)
+            {
+                exsit=exsit.concat(exsit_air[i].value);
+            }
+
+        }
+        for(i=0;i<exsit_soilt.length;i++){
+            if(exsit_soilt[i].value!=''&& exsit_soilt[i]!=e)
+            {
+                exsit=exsit.concat(exsit_soilt[i].value);
+            }
+
+        }
+        for(i=0;i<exsit_soilm.length;i++){
+            if(exsit_soilm[i].value!=''&& exsit_soilm[i]!=e)
+            {
+                exsit=exsit.concat(exsit_soilm[i].value);
+            }
+
+        }
+        for(i=0;i<exsit_light.length;i++){
+            if(exsit_light[i].value!=''&& exsit_light[i]!=e)
+            {
+                exsit=exsit.concat(exsit_light[i].value);
+            }
+
+        }
+        for(i=0;i<exsit_coz.length;i++){
+            if(exsit_coz[i].value!=''&& exsit_coz[i]!=e)
+            {
+                exsit=exsit.concat(exsit_coz[i].value);
+            }
+
+        }
+        for(i=0;i<exsit.length;i++){
+            if(newindex==exsit[i])
+            {
+                Flag=0;
+                $(e.nextElementSibling).toggle();
+                $('#SaveNew').attr('disabled','disabled');
+                {% comment %}e.value="";{% endcomment %}
+                break;
+            }
+
+        }
+
+    }
+    else
+    {
+        $(e.nextElementSibling.nextElementSibling.nextElementSibling).attr('disabled','disabled');
+    }
+    if(Flag==1 && Validate()==1){
+            $('#SaveNew').removeAttr('disabled');
+    }
+}
+
+function CheckAll(){
+    var Tip= 0;
+    var flag1=0;
+    var flag2=0;
+    var flag3=0;
+    var flag4=0;
+    var flag5=0;
+    var exsit_air=document.getElementsByName('num_air[]');
+    var exsit_soilt=document.getElementsByName('num_soilt[]');
+    var exsit_soilm=document.getElementsByName('num_soilm[]');
+    var exsit_light=document.getElementsByName('num_light[]');
+    var exsit_coz=document.getElementsByName('num_coz[]');
+    var i1,i2,i3,i4,i5;
+    for(i1=0;i1<exsit_air.length;i1++)
+    {
+        if(exsit_air[i1].value!=''){
+            flag1=1;
+            break;
+        }
+    }
+    for(i2=0;i2<exsit_soilt.length;i2++)
+    {
+        if(exsit_soilt[i2].value!=''){
+            flag2=1;
+            break;
+        }
+    }
+    for(i3=0;i3<exsit_soilm.length;i3++)
+    {
+        if(exsit_soilm[i3].value!=''){
+            flag3=1;
+            break;
+        }
+    }
+    for(i4=0;i4<exsit_light.length;i4++)
+    {
+        if(exsit_light[i4].value!=''){
+            flag4=1;
+            break;
+        }
+    }
+    for(i5=0;i5<exsit_coz.length;i5++)
+    {
+        if(exsit_coz[i5].value!=''){
+            flag5=1;
+            break;
+        }
+    }
+    if(flag1==1||flag2==1||flag3==1||flag4==1||flag5==1)
+    {
+        Tip=1;
+    }
+    return Tip;
+}
+
+function CheckEdit(e){
+    var newindex= e.value;
+    var exsit=[];
+    var i;
+    var exsit_air=document.getElementsByName('num_air[]');
+    var exsit_soilt=document.getElementsByName('num_soilt[]');
+    var exsit_soilm=document.getElementsByName('num_soilm[]');
+    var exsit_light=document.getElementsByName('num_light[]');
+    var exsit_coz=document.getElementsByName('num_coz[]');
+    var Flag=1;
+    for(i=0;i<exsit_air.length;i++){
+        if(exsit_air[i].value!=''&& exsit_air[i]!=e)
+        {
+            exsit=exsit.concat(exsit_air[i].value);
+        }
+
+    }
+    for(i=0;i<exsit_soilt.length;i++){
+        if(exsit_soilt[i].value!=''&& exsit_soilt[i]!=e)
+        {
+            exsit=exsit.concat(exsit_soilt[i].value);
+        }
+
+    }
+    for(i=0;i<exsit_soilm.length;i++){
+        if(exsit_soilm[i].value!=''&& exsit_soilm[i]!=e)
+        {
+            exsit=exsit.concat(exsit_soilm[i].value);
+        }
+
+    }
+    for(i=0;i<exsit_light.length;i++){
+        if(exsit_light[i].value!=''&& exsit_light[i]!=e)
+        {
+            exsit=exsit.concat(exsit_light[i].value);
+        }
+
+    }
+    for(i=0;i<exsit_coz.length;i++){
+        if(exsit_coz[i].value!=''&& exsit_coz[i]!=e)
+        {
+            exsit=exsit.concat(exsit_coz[i].value);
+        }
+
+    }
+    for(i=0;i<exsit.length;i++){
+        if(newindex==exsit[i])
+        {
+            Flag=0;
+            $(e.nextElementSibling).toggle();
+            $('#DoEdit').attr('disabled','disabled');
+            {% comment %}e.value="";{% endcomment %}
+            break;
+        }
+
+    }
+}
+
+function DelSensor(e){
+    var num;
+    num=$(e).parent().parent()[0].rowIndex;
+    document.getElementById('ThisStore').deleteRow(num);
+}
+
+function ShowDetails(e){
+    var i=0;
+    var j;
+    var NumName;
+    var TypeName;
+    var AddrName;
+    var storenum=document.getElementById('EditNum');
+    storenum.innerHTML= e;
+    var len= e.length;
+    var Store= e.substring(0,len-3);
+    $('#EditStore').css('display','block');
+    var rows= document.getElementById('ThisStore').rows.length;
+    if(rows>2)
+    {
+        for(j=1;j<rows-1;j++){
+            var NewRows=document.getElementById('ThisStore').rows.length;
+            document.getElementById('ThisStore').deleteRow(NewRows-2);
+        }
+    }
+    $.getJSON("/storagemanage/"+Store+"",function(data){
+        for(i=0;i<data.length;i++){
+            switch (data[i].type){
+                case "air":
+                    NumName="num_air[]";
+                    AddrName="Addr_air[]";
+                    TypeName="空气温湿度";
+                    break;
+                case "soilt":
+                    NumName="num_soilt[]";
+                    AddrName="Addr_soilt[]";
+                    TypeName="土壤温度";
+                    break;
+                case "soilm":
+                    NumName="num_soilm[]";
+                    AddrName="Addr_soilm[]";
+                    TypeName="土壤湿度";
+                    break;
+                case "sun":
+                    NumName="num_light[]";
+                    AddrName="Addr_light[]";
+                    TypeName="光照";
+                    break;
+                case "coz":
+                    NumName="num_coz[]";
+                    AddrName="Addr_coz[]";
+                    TypeName="二氧化碳";
+                    break;
+            }
+            var newrow='<tr><td><input type="checkbox" class="checkbox" /></td><td><input class="num" name="'+NumName+'" value="'+data[i].index+'" type="text" onchange="CheckEdit(this)" onfocus="$(this.nextElementSibling).hide()" style="width: 50px"/><span class="form_hint" style="display: none">该传感器已存在，请重新输入！</span></td><td><input class="type" type="text" value="'+TypeName+'" readonly="readonly" /></td><td><select class="Addr" name="'+AddrName+'"><option>左上</option><option>左中</option><option>左下</option><option>中上</option><option>中间</option><option>中下</option><option>右上</option><option>右中</option><option>右下</option></select></td><td><a href="#" class="ico del" onclick="DelSensor(this)">删除</a></td></tr>';
+            $('#ThisStore tr:last').before(newrow);
+            var obj=document.getElementsByClassName("Addr");
+            obj[i].value=data[i].location;
+        }
+    })
+}
+
+function ShowStore(e){
+     var i=0;
+    var j;
+    var TypeName;
+    var storenum=document.getElementById('EditNum1');
+    storenum.innerHTML= e;
+    var len= e.length;
+    var Store= e.substring(0,len-3);
+    $('#ShowStore').css('display','block');
+    var rows= document.getElementById('ThisStore1').rows.length;
+    if(rows>2)
+    {
+        for(j=1;j<rows-1;j++){
+            var NewRows=document.getElementById('ThisStore1').rows.length;
+            document.getElementById('ThisStore1').deleteRow(NewRows-2);
+        }
+    }
+    $.getJSON("/storagemanage/"+Store+"",function(data){
+        for(i=0;i<data.length;i++){
+            switch (data[i].type){
+                case "air":
+                    TypeName="空气温湿度";
+                    break;
+                case "soilt":
+                    TypeName="土壤温度";
+                    break;
+                case "soilm":
+                    TypeName="土壤湿度";
+                    break;
+                case "sun":
+                    TypeName="光照";
+                    break;
+                case "coz":
+                    TypeName="二氧化碳";
+                    break;
+            }
+            var newrow='<tr><td></td><td><input class="num" value="'+data[i].index+'" type="text"  readonly="readonly" style="width: 50px"/></td><td><input class="type" type="text" value="'+TypeName+'" readonly="readonly" /></td><td><input class="Addr" type="text" value="'+data[i].location+'" readonly="readonly" /></td></tr>';
+            $('#ThisStore1 tr:last').before(newrow);
+        }
+    })
+}
+</script>
+</html>

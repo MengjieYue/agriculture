@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="zh">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>作物生长环境检测系统平台</title>
+<!-- Favicons -->
+<link rel="shortcut icon" type="image/png" HREF="../static/img/favicons/favicon.gif"/>
+<link rel="icon" type="image/png" HREF="../static/img/favicons/favicon.gif"/>
+<link rel="apple-touch-icon" HREF="../static/img/favicons/styler-icon.png" />
+<link href="../static/css/newstyle.css" rel="stylesheet" type="text/css" />
+<link href="../static/css/main.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="../static/js/jquery.oncontextmenu.js"></script>
+<script type="text/javascript" src="../static/js/members.js"></script>
+<!--<script type="text/javascript" src="../static/js/jquery-ui.js"></script>-->
+<script type="text/javascript" src="../static/js/WdatePicker.js"></script>
+<script type="text/javascript" src="../static/js/jquery-2.1.1.js"></script>
+<script type="text/javascript" src="../static/js/jquery-1.6.4.min.js"></script>
+<!--<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>-->
+<style type="text/css">
+.menu-panel {
+    background: #EDF4ED;
+    width: 200px;
+    height: 100%;
+    float:left;
+    z-index: 1000;
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-right-color: #c8cfc8;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+.menu-panel h3 {
+	font-size: 1.8em;
+	padding: 20px;
+	font-weight: 300;
+	color: #007722;
+	box-shadow: inset 0 -1px 0 rgba(0,0,0,0.05);
+    margin-top: 10px;
+}
+.menu-panel h4 {
+	font-size: 1.3em;
+	padding-top: 0;
+    padding-left: 15px;
+	font-weight: 300;
+	color: #48A355;
+}
+.menu-toc {
+	list-style: none;
+}
+
+.menu-toc li a {
+	display: block;
+	color: #48A355;
+	font-size: 1.4em;
+	line-height: 3.5;
+	padding: 0 20px;
+	cursor: pointer;
+	background: #EDF4ED;
+	border-bottom: 1px solid #c8cfc8;
+}
+
+.menu-toc li a:hover,
+.menu-toc li.menu-toc-current a{
+	background: #EDF4ED;
+}
+
+.menu-panel div {
+	margin-top: 20px;
+}
+
+.menu-panel div a {
+	text-transform: uppercase;
+	font-size: 0.7em;
+	line-height: 1;
+	padding: 5px 20px;
+	display: block;
+	border: none;
+	color: #EDF4ED;
+	letter-spacing: 1px;
+	font-weight: 800;
+	text-shadow: 0 1px rgba(255,255,255,0.2);
+}
+
+.menu-panel div a:hover {
+	background: inherit;
+	color: #48A355;
+	text-shadow: none;
+}
+
+#tip li{
+    text-transform: uppercase;
+	font-size: 0.7em;
+	line-height: 1;
+	padding: 5px 20px;
+	display: block;
+	border: none;
+	color: #EDF4ED;
+	letter-spacing: 1px;
+	font-weight: 800;
+	text-shadow: 0 1px rgba(255,255,255,0.2);
+}
+#tip li:hover{
+    background: inherit;
+	color: #48A355;
+	text-shadow: none;
+}
+
+</style>
+<script type="text/javascript">
+    function ChooseA(){
+        $("#ChooseBySensor").show();
+        $("#ChooseByTime").hide();
+        $('#PicResult').attr('src','');
+    }
+    function ChooseB(){
+        $("#ChooseBySensor").hide();
+        $("#ChooseByTime").show();
+        $('#PicResult').attr('src','');
+    }
+    function SearchBySensor(){
+
+        $('#PicResult').attr('src','/test2/'+$('#StoreList1')[0].value+'/'+$('#SensorList')[0].value+'/'+$('#datepicker1')[0].value+'/'+$('#datepicker2')[0].value+'/');
+        {% comment %}alert('/test2/'+$('#StoreList1')[0].value+'/'+$('#SensorList')[0].value+'/'+$('#datepicker1')[0].value+'/'+$('#datepicker2')[0].value+'/');{% endcomment %}
+        {% comment %}$('#PicResult').attr('src','/test2/1/1/1/');{% endcomment %}
+    }
+    function SearchByTime(){
+        $('#PicResult').attr('src','/test/'+$('#StoreList2')[0].value+'/'+$('#SensorType2')[0].value+'/'+$('#datepicker3')[0].value+'/');
+        {% comment %}alert('/test/'+$('#StoreList2')[0].value+'/'+$('#SensorType2')[0].value+'/'+$('#datepicker3')[0].value+'/');{% endcomment %}
+    }
+    function ShowSensorList(){
+        var store=$('#StoreList1').find("option:selected")[0].value;
+        var type=$('#SensorType').find("option:selected")[0].value;
+        var sensorlist=document.getElementById('SensorList');
+        var i;
+         $.getJSON("/storagemonitor/"+store+"/"+type+"",function(data){
+             $('#SensorList').empty();
+             for(i=0;i< data.length;i++){
+                 var newoption=document.createElement('option');
+                 newoption.value=data[i];
+                 newoption.innerHTML=""+data[i]+"号";
+
+                 sensorlist.appendChild(newoption);
+             }
+         })
+    }
+    function ShowSensorList1(){
+        var store=$('#StoreList1').find("option:selected")[0].value;
+        var typelist=document.getElementById('SensorType');
+        var sensorlist=document.getElementById('SensorList');
+        var i;
+         $.getJSON("/storagemonitor/"+store+"",function(data){
+             $('#SensorType').empty();
+             for(i=0;i < data.length;i++){
+                 var newoption=document.createElement('option');
+                 switch (data[i]){
+                     case "air":newoption.innerHTML="空气温湿度";
+                         break;
+                     case "soilm":newoption.innerHTML="土壤湿度";
+                         break;
+                     case "soilt":newoption.innerHTML="土壤温度";
+                         break;
+                     case "sun":newoption.innerHTML="光照";
+                         break;
+                     case "coz":newoption.innerHTML="二氧化碳";
+                         break;
+                 }
+                 newoption.value=""+data[i]+"";
+                 typelist.appendChild(newoption);
+             }
+             $.getJSON("/storagemonitor/"+store+"/"+data[0]+"",function(data1){
+                  $('#SensorList').empty();
+                  for(i=0;i < data1.length;i++){
+                     var newoption=document.createElement('option');
+                     newoption.innerHTML=""+data1[i]+"号";
+                     newoption.value=""+data1[i]+"";
+                     sensorlist.appendChild(newoption);
+                  }
+             })
+         })
+    }
+
+    function ShowTypeList(){
+        var store=$('#StoreList2').find("option:selected")[0].value;
+        var typelist=document.getElementById('SensorType2');
+        var i;
+         $.getJSON("/storagemonitor/"+store+"",function(data){
+             $('#SensorType2').empty();
+             for(i=0;i < data.length;i++){
+                 var newoption=document.createElement('option');
+                 switch (data[i]){
+                     case "air":newoption.innerHTML="空气温湿度";
+                         break;
+                     case "soilm":newoption.innerHTML="土壤湿度";
+                         break;
+                     case "soilt":newoption.innerHTML="土壤温度";
+                         break;
+                     case "sun":newoption.innerHTML="光照";
+                         break;
+                     case "coz":newoption.innerHTML="二氧化碳";
+                         break;
+                 }
+                 newoption.value=""+data[i]+"";
+                 typelist.appendChild(newoption);
+             }
+         })
+    }
+</script>
+</head>
+<body>
+<div id="newtopPanel">
+  <img src="../static/images/logo.gif" title="Trial Services" alt="Trial Services" width="230" height="80" border="0" />
+  <br>
+  <h1 style="color:black; text-align:center;">作物生长环境检测系统平台</h1>
+  <br>
+  <br>
+  <a id="logout" href="/" style="text-decoration:none;">欢迎您，<span>{{ logeduser }}</span> &nbsp; &nbsp;退出</a>
+  <hr>
+
+</div>
+
+<div id="newbodyPanel" style="background-color:#EDF4ED ">
+ <div class="menu-panel" >
+    <h3><img src="../static/img/gif-0258.gif" alt=""/>查询方法</h3>
+    <ul id="menu-toc" class="menu-toc">
+        <li class="menu-toc-current"><a onclick="ChooseA()">传感器数据查询</a></li>
+        <li><a onclick="ChooseB()">库房环境查询</a></li>
+    </ul>
+    {% comment %}<div>
+        <h4>Tips:</h4>
+        <ul id="tip">
+            <li>如果您想查看某个传感器的数据请选择单个传感器查询</li>
+            <li>如果您想查看某个时间点的数据请选择单个时间查询</li>
+        </ul>
+    </div>{% endcomment %}
+ </div>
+ <div style="min-width: 795px;overflow-x: auto;">
+     <div id="ChooseBySensor" style="margin-left:10px;margin-top:10px;display: none">
+        <div style="margin-top: 5px;margin-left: 10px;margin-right: 10px">
+             <a>库房:</a>
+             <select id="StoreList1" onchange="ShowSensorList1()">
+                {% for storage in sotrage_list %}
+                    <option value="{{ storage.index }}">{{ storage.index }}号库房</option>
+                 {% endfor %}
+             </select>&nbsp; &nbsp;&nbsp; &nbsp;
+
+            <a>传感器类型：</a>
+                <select id="SensorType" onchange="ShowSensorList()">
+                    <option value="air">空气温湿度</option>
+                    <option value="soilt">土壤温度</option>
+                    <option value="soilm">土壤湿度</option>
+                    <option value="sun">光照</option>
+                    <option value="coz">二氧化碳</option>
+                </select>&nbsp; &nbsp;&nbsp; &nbsp;
+
+            <a>传感器编号：</a>
+             <select id="SensorList">
+                {% for sensor in first_sensor %}
+                    <option value="{{ sensor.sensor_index }}">{{ sensor.sensor_index }}号</option>
+                 {% endfor %}
+             </select>&nbsp; &nbsp;&nbsp; &nbsp;
+        </div>
+
+        <div style="margin-top: 5px;margin-left: 10px;margin-right: 10px">
+            <a>时间段：</a>
+            <a> 从</a><input id="datepicker1" type="text" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd-HH-mm',maxDate:'%y-%M-%d-%H-%m'})"/>
+            <a>到</a>
+            <input id="datepicker2" class="Wdate" type="text" onclick="WdatePicker({dateFmt:'yyyy-MM-dd-HH-mm',minDate:'#F{$dp.$D(\'datepicker1\')}',maxDate:'%y-%M-%d-%H-%m'})"/>
+            &nbsp; &nbsp;
+            <input id="ButtonSearch" type="button" value="查询" onclick="SearchBySensor()" style="margin-top: 5px;margin-left: 10px;margin-right: 10px"/>
+        </div>
+     </div>
+
+     <div id="ChooseByTime" style="margin-left:10px;margin-top:10px;display: none">
+        <a>时间：</a><input id="datepicker3" type="text" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd-HH-mm',maxDate:'%y-%M-%d-%H-%m'})"/>
+        <a>库房:</a>
+         <select id="StoreList2" onchange="ShowTypeList()">
+             {% for storage in sotrage_list %}
+                <option value="{{ storage.index }}">{{ storage.index }}号库房</option>
+             {% endfor %}
+         </select>&nbsp; &nbsp;
+        <a>传感器类型：</a>
+        <select  id="SensorType2">
+            <option value="air">空气温湿度</option>
+            <option value="soilt">土壤温度</option>
+            <option value="soilm">土壤湿度</option>
+            <option value="sun">光照</option>
+            <option value="coz">二氧化碳</option>
+        </select>&nbsp; &nbsp;
+        <input id="ButtonSearch" type="button" value="查询" onclick="SearchByTime()"/>
+     </div>
+     <img id="PicResult" src="" style="margin-left: 75px;margin-top: 15px"/>
+ </div>
+
+
+
+</div>
+
+<div id="newfooterPanel">
+  <div id="newfooterbodyPanel">
+    <p class="copyright">copyright © 2015 智慧农业管理平台</p>
+  </div>
+</div>
+
+
+
+</body>
+</html>
